@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import Marker from './Marker';
 
-const StyleWrapper = styled.div`
+const StyleWrapper: any = styled.div`
   position: fixed;
   left: 40px;
   top: 40px;
@@ -13,6 +14,8 @@ const StyleWrapper = styled.div`
   z-index: 1;
   box-shadow: 0 0 4px 0px #fff;
   overflow: hidden;
+
+  visibility: ${({ visible }: any) => (visible ? 'visible' : 'hidden')};
 `;
 
 const Title = styled.div`
@@ -61,35 +64,55 @@ interface channel {
   url?: string;
 }
 
+let timer: any = null;
+
 export default ({ data, onChange }: any) => {
   const [item, setItem] = useState<channel>({});
+  const [visible, setVisible] = useState(true);
   const onClick = (d: channel) => {
     setItem(d);
     onChange && onChange(d);
   };
 
-  const onKeyUp = () => {};
+  const onKeyUp = () => {
+    setVisible(true);
+
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    timer = setTimeout(() => setVisible(false), 6000);
+  };
 
   useEffect(() => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    timer = setTimeout(() => setVisible(false), 6000);
     document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('click', onKeyUp);
     return () => {};
   }, []);
 
   return (
-    <StyleWrapper>
-      <Title>全部频道</Title>
-      <List>
-        {data.map((d: channel) => (
-          <li
-            key={d.url}
-            className={`${item.id === d.id ? 'active' : ''}`}
-            onClick={() => onClick(d)}
-          >
-            <ChannelId>{d.id}</ChannelId>
-            {d.name}
-          </li>
-        ))}
-      </List>
-    </StyleWrapper>
+    <React.Fragment>
+      <StyleWrapper visible={visible}>
+        <Title>全部频道</Title>
+        <List>
+          {data.map((d: channel) => (
+            <li
+              key={d.url}
+              className={`${item.id === d.id ? 'active' : ''}`}
+              onClick={() => onClick(d)}
+            >
+              <ChannelId>{d.id}</ChannelId>
+              {d.name}
+            </li>
+          ))}
+        </List>
+      </StyleWrapper>
+      <Marker channel={item} visible={visible} />
+    </React.Fragment>
   );
 };
