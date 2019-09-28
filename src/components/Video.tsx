@@ -17,6 +17,7 @@ export default ({ channel }: any) => {
 
   useEffect(() => {
     if (instRef.current && channel.url !== undefined) {
+      console.log(channel.url);
       var video: any = instRef.current;
       hls.loadSource(channel.url);
       hls.attachMedia(video);
