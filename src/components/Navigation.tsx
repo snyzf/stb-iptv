@@ -74,9 +74,7 @@ export default ({ data, onChange }: any) => {
     onChange && onChange(d);
   };
 
-  const onKeyUp = () => {
-    setVisible(true);
-
+  const resetVisible = () => {
     if (timer) {
       clearTimeout(timer);
       timer = null;
@@ -84,12 +82,19 @@ export default ({ data, onChange }: any) => {
     timer = setTimeout(() => setVisible(false), 6000);
   };
 
-  useEffect(() => {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
+  const onKeyUp = (event: any) => {
+    if (event.key === 'Escape') {
+      setVisible(false);
+      return;
     }
-    timer = setTimeout(() => setVisible(false), 6000);
+
+    setVisible(true);
+
+    resetVisible();
+  };
+
+  useEffect(() => {
+    resetVisible();
     document.addEventListener('keyup', onKeyUp);
     document.addEventListener('click', onKeyUp);
     return () => {};
